@@ -36,8 +36,11 @@ class PasswordDetector: Detector {
         private val specialChars = listOf("!", "@", "#", "$", "%", "&", "*")
         override fun on(char: String): State? {
             return when (char) {
-                in specialChars -> PasswordHasAll
-                else -> PasswordOnlyCapital
+                in specialChars -> {
+                    PasswordHasAll.acceptable = false
+                    PasswordHasAll
+                }
+                else -> this
             }
         }
 
@@ -47,11 +50,13 @@ class PasswordDetector: Detector {
     private object PasswordOnlySpecial: State {
         override fun on(char: String): State? {
             return when (char) {
-                in "A".."Z" -> PasswordHasAll
-                else -> PasswordOnlySpecial
+                in "A".."Z" -> {
+                    PasswordHasAll.acceptable = true
+                    PasswordHasAll
+                }
+                else -> this
             }
         }
-
         override fun canAccept(): Boolean = false
     }
 
